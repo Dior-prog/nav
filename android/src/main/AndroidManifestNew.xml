@@ -1,0 +1,63 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  package="com.sijav.reactnativev2raymodule">
+
+  <uses-feature
+    android:name="android.hardware.camera"
+    android:required="false" />
+  <uses-feature
+    android:name="android.hardware.camera.autofocus"
+    android:required="false" />
+  <uses-feature
+    android:name="android.software.leanback"
+    android:required="false" />
+  <uses-feature
+    android:name="android.hardware.touchscreen"
+    android:required="false" />
+
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+  <application android:usesCleartextTraffic="true">
+    <service
+      android:name=".service.V2RayVpnService"
+      android:enabled="true"
+      android:exported="false"
+      android:label="@string/app_name"
+      android:permission="android.permission.BIND_VPN_SERVICE"
+      android:process=":RunSoLibV2RayDaemon">
+      <intent-filter>
+        <action android:name="android.net.VpnService" />
+      </intent-filter>
+      <meta-data
+        android:name="android.net.VpnService.SUPPORTS_ALWAYS_ON"
+        android:value="true" />
+    </service>
+
+    <service
+      android:name=".service.V2RayProxyOnlyService"
+      android:exported="false"
+      android:label="@string/app_name"
+      android:process=":RunSoLibV2RayDaemon" />
+
+    <service
+      android:name=".service.V2RayTestService"
+      android:exported="false"
+      android:process=":RunSoLibV2RayDaemon" />
+
+    <service
+      android:name=".service.QSTileService"
+      android:exported="true"
+      android:icon="@drawable/ic_stat_name"
+      android:label="@string/app_tile_name"
+      android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+      android:process=":RunSoLibV2RayDaemon">
+      <intent-filter>
+        <action android:name="android.service.quicksettings.action.QS_TILE" />
+      </intent-filter>
+    </service>
+
+  </application>
+</manifest>

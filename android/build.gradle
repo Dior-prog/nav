@@ -1,0 +1,136 @@
+import com.android.Version
+
+buildscript {
+  // Buildscript is evaluated before everything else so we can't use getExtOrDefault
+  def kotlin_version = rootProject.ext.has("kotlinVersion") ? rootProject.ext.get("kotlinVersion") : project.properties["V2rayModule_kotlinVersion"]
+
+  repositories {
+    google()
+    mavenCentral()
+    jcenter()
+  }
+
+  dependencies {
+    classpath "com.android.tools.build:gradle:7.2.2"
+    // noinspection DifferentKotlinGradleVersion
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+  }
+}
+
+def isNewArchitectureEnabled() {
+  return rootProject.hasProperty("newArchEnabled") && rootProject.getProperty("newArchEnabled") == "true"
+}
+
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
+
+
+def appProject = rootProject.allprojects.find { it.plugins.hasPlugin('com.android.application') }
+
+if (isNewArchitectureEnabled()) {
+  apply plugin: "com.facebook.react"
+}
+
+def getExtOrDefault(name) {
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["V2rayModule_" + name]
+}
+
+def getExtOrIntegerDefault(name) {
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["V2rayModule_" + name]).toInteger()
+}
+
+static def supportsNamespace() {
+  def parsed = Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')
+  def major = parsed[0].toInteger()
+  def minor = parsed[1].toInteger()
+
+  // Namespace support was added in 7.3.0
+  if (major == 7 && minor >= 3) {
+    return true
+  }
+
+  return major >= 8
+}
+
+android {
+  if (supportsNamespace()) {
+    namespace "com.sijav.reactnativev2raymodule"
+
+    sourceSets {
+      main {
+        jniLibs.srcDirs = ['jniLibs']
+        java.srcDirs += 'src/main/java'
+        manifest.srcFile "src/main/AndroidManifestNew.xml"
+      }
+    }
+  }
+
+  compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
+
+  defaultConfig {
+    minSdkVersion getExtOrIntegerDefault("minSdkVersion")
+    targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
+    buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
+  }
+  buildTypes {
+    release {
+      minifyEnabled false
+    }
+  }
+
+  lintOptions {
+    disable "GradleCompatible"
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+
+  buildFeatures {
+    viewBinding true
+    buildConfig true
+  }
+}
+
+repositories {
+  mavenCentral()
+  google()
+  jcenter()
+}
+
+def kotlin_version = getExtOrDefault("kotlinVersion")
+
+dependencies {
+  implementation fileTree(dir: 'libs', include: ['*.aar', '*.jar'], exclude: [])
+  // For < 0.71, this will be from the local maven repo
+  // For > 0.71, this will be replaced by `com.facebook.react:react-android:$version` by react gradle plugin
+  //noinspection GradleDynamicVersion
+  implementation 'com.facebook.react:react-native:0.71.0-rc.0'
+  implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+  implementation "org.jetbrains.kotlin:kotlin-reflect:1.8.10"
+  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
+  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
+
+  implementation 'com.tencent:mmkv-static:1.2.15'
+  implementation 'com.google.code.gson:gson:2.10.1'
+  implementation 'io.reactivex:rxjava:1.3.8'
+  implementation 'io.reactivex:rxandroid:1.2.1'
+  implementation 'com.tbruyelle.rxpermissions:rxpermissions:0.9.4@aar'
+  implementation 'com.github.jorgecastilloprz:fabprogresscircle:1.01@aar'
+  implementation 'me.drakeet.support:toastcompat:1.1.0'
+  implementation 'com.blacksquircle.ui:editorkit:2.8.0'
+  implementation 'com.blacksquircle.ui:language-base:2.8.0'
+  implementation 'com.blacksquircle.ui:language-json:2.8.0'
+  implementation 'io.github.g00fy2.quickie:quickie-bundled:1.6.0'
+  implementation 'com.google.zxing:core:3.5.1'
+}
+
+if (isNewArchitectureEnabled()) {
+  react {
+    jsRootDir = file("../src/")
+    libraryName = "V2rayModule"
+    codegenJavaPackageName = "com.sijav.reactnativev2raymodule"
+  }
+}

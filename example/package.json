@@ -1,0 +1,30 @@
+{
+  "name": "V2rayModuleExample",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "pods": "pod-install --quiet"
+  },
+  "dependencies": {
+    "android": "^0.0.8",
+    "react": "18.2.0",
+    "react-native": "0.72.4",
+    "react-native-document-picker": "^9.0.1",
+    "react-native-fs": "^2.20.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@babel/preset-env": "^7.20.0",
+    "@babel/runtime": "^7.20.0",
+    "@react-native/eslint-config": "^0.72.2",
+    "@react-native/metro-config": "^0.72.11",
+    "babel-plugin-module-resolver": "^5.0.0",
+    "metro-react-native-babel-preset": "0.76.8"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}
